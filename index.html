@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Discord Role Redeem</title>
+	<style>
+	body {
+		background: #2EAAE0;
+		/*background: rgb(34,23,214);*/
+		/*background: -moz-linear-gradient(270deg, rgba(34,23,214,1) 0%, rgba(33,33,232,1) 35%, rgba(0,212,255,1) 100%);*/
+		/*background: -webkit-linear-gradient(270deg, rgba(34,23,214,1) 0%, rgba(33,33,232,1) 35%, rgba(0,212,255,1) 100%);*/
+		/*background: linear-gradient(270deg, rgba(34,23,214,1) 0%, rgba(33,33,232,1) 35%, rgba(0,212,255,1) 100%);*/
+		/*filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#2217d6",endColorstr="#00d4ff",GradientType=1);*/
+	}
+	.grid {
+    	display: grid;
+    	grid-template-columns: repeat(5, 1fr);
+    	grid-gap: 5px;
+    	width: 50vw;
+    	padding: 1rem;
+    	position: fixed;
+	  	left: 50%;
+	  	transform: translate(-50%, 0);
+	}
+	.grid, .info {
+		background: #81CDEE;
+		border-radius: 10px;
+		/*background: rgb(0,234,255);*/
+		/*background: -moz-linear-gradient(270deg, rgba(0,234,255,1) 0%, rgba(33,172,232,1) 35%, rgba(33,218,255,1) 100%);*/
+		/*background: -webkit-linear-gradient(270deg, rgba(0,234,255,1) 0%, rgba(33,172,232,1) 35%, rgba(33,218,255,1) 100%);*/
+		/*background: linear-gradient(270deg, rgba(0,234,255,1) 0%, rgba(33,172,232,1) 35%, rgba(33,218,255,1) 100%);*/
+		/*filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#00eaff",endColorstr="#21daff",GradientType=1);*/
+	}
+	.info {
+		width: 20vw;
+		position: fixed;
+		padding: 1rem;
+	}
+	.grid * {
+		overflow-y: hidden;
+		white-space: nowrap;
+		height: 1rem;
+		outline: none;
+		background: #2EAAE0;
+		border-radius: 10px;
+		padding: 5px;
+	  	/*background: rgba(0,234,255, 0.1);*/
+	}
+	.add, .del {
+		margin-left: 1rem;
+		width: 2rem;
+		height: 2rem;
+		border-radius: 50%;
+		background: #54BBE7;
+		border-color: #54BBE7;
+	}
+	.save {
+		position: fixed;
+		top: 0;
+		right: 0;
+		margin: 1rem;
+		width: 10rem;
+		height: 3rem;
+		border-radius: 40px;
+	}
+	</style>
+</head>
+<body>
+	<div class="info">
+		<li>1 hour - 3600000</li>
+		<li>1 day - 86400000</li>
+		<li>1 week - 604800000</li>
+		<li>30 days - 2592000000</li>
+	</div>
+	<div class="grid">
+		<div>Code</div>
+		<div>Role</div>
+		<div>Used?</div>
+		<div>Expiration</div>
+		<button class="add">+</button>
+	</div>
+	<button class="save">Save Changes</button>
+</body>
+</html>
+<script>
+const textarea = document.querySelector('textarea');
+const grid = document.querySelector('.grid');
+
+var data;
+(async () => {
+	var req = await fetch('.?get=1');
+	var res = await req.text();
+	data = res.split('\n').splice(1);
+	for (var i = 0; i < data.length; i++) {
+		data[i] = data[i].split(',');
+		grid.insertAdjacentHTML('beforeend', `<div contenteditable>${data[i][0]}</div><div contenteditable>${data[i][1]}</div><div contenteditable>${data[i][2]}</div><div contenteditable>${data[i][3]}</div><button class="del">-</button>`);
+	}
+	var dels = document.getElementsByClassName('del');
+
+	for (var i = 0; i < dels.length; i++) {
+		dels[i].addEventListener('click', e => deleteRow(e.target));
+	}
+
+	document.querySelector('.add').addEventListener('click', () => {
+		grid.insertAdjacentHTML('beforeend', `<div contenteditable>${genCode()}</div><div contenteditable></div><div contenteditable>no</div><div contenteditable></div><button class="del">-</button>`);
+		dels[dels.length-1].addEventListener('click', e => deleteRow(e.target));
+	});
+
+	document.querySelector('.save').addEventListener('click', () => {
+		fetch(`.?content=${encodeURI(parseData())}`);
+	});
+})();
+
+function genCode(length=16) {
+	var code = "";
+	for (var i = 0; i < length; i++) {
+		code += randomLetter();
+	}
+	code = code.replace(/(\w{4})/g, '$1-').slice(0, -1);
+	return codeExists(code) ? genCode() : code;
+}
+
+function codeExists(code) {
+	return parseData().indexOf(code) > -1;
+}
+
+function randomLetter() {
+	return "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[Math.random()*26|0];
+}
+
+function parseData() {
+	var str = 'code,role,used,expiration\n';
+	var els = document.querySelectorAll('.grid div');
+	for (var i = 4; i < els.length; i++) {
+		if (i % 4 === 3 && els[i].innerText.split('+')[0] === "now") els[i].innerText = new Date().getTime()+eval(els[i].innerText.substr(4));
+		str += els[i].innerText;
+		str += i % 4 === 3 ? '\n' : ',';
+	}
+	return str.trim();
+}
+
+function deleteRow(el) {
+	for (var i = 0; i < 4; i++) if (!!el.previousElementSibling) el.previousElementSibling.remove();
+	el.remove();
+}
+</script>
