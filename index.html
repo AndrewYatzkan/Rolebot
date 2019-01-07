@@ -5,11 +5,6 @@
 	<style>
 	body {
 		background: #2EAAE0;
-		/*background: rgb(34,23,214);*/
-		/*background: -moz-linear-gradient(270deg, rgba(34,23,214,1) 0%, rgba(33,33,232,1) 35%, rgba(0,212,255,1) 100%);*/
-		/*background: -webkit-linear-gradient(270deg, rgba(34,23,214,1) 0%, rgba(33,33,232,1) 35%, rgba(0,212,255,1) 100%);*/
-		/*background: linear-gradient(270deg, rgba(34,23,214,1) 0%, rgba(33,33,232,1) 35%, rgba(0,212,255,1) 100%);*/
-		/*filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#2217d6",endColorstr="#00d4ff",GradientType=1);*/
 	}
 	.grid {
     	display: grid;
@@ -24,11 +19,6 @@
 	.grid, .info {
 		background: #81CDEE;
 		border-radius: 10px;
-		/*background: rgb(0,234,255);*/
-		/*background: -moz-linear-gradient(270deg, rgba(0,234,255,1) 0%, rgba(33,172,232,1) 35%, rgba(33,218,255,1) 100%);*/
-		/*background: -webkit-linear-gradient(270deg, rgba(0,234,255,1) 0%, rgba(33,172,232,1) 35%, rgba(33,218,255,1) 100%);*/
-		/*background: linear-gradient(270deg, rgba(0,234,255,1) 0%, rgba(33,172,232,1) 35%, rgba(33,218,255,1) 100%);*/
-		/*filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#00eaff",endColorstr="#21daff",GradientType=1);*/
 	}
 	.info {
 		width: 20vw;
@@ -43,7 +33,6 @@
 		background: #2EAAE0;
 		border-radius: 10px;
 		padding: 5px;
-	  	/*background: rgba(0,234,255, 0.1);*/
 	}
 	.add, .del {
 		margin-left: 1rem;
@@ -87,7 +76,7 @@ const grid = document.querySelector('.grid');
 
 var data;
 (async () => {
-	var req = await fetch('.?get=1');
+	var req = await fetch(`${window.location.href}?get=1`);
 	var res = await req.text();
 	data = res.split('\n').splice(1);
 	for (var i = 0; i < data.length; i++) {
@@ -106,7 +95,7 @@ var data;
 	});
 
 	document.querySelector('.save').addEventListener('click', () => {
-		fetch(`.?content=${encodeURI(parseData())}`);
+		fetch(`${window.location.href}?content=${encodeURI(parseData())}`);
 	});
 })();
 
