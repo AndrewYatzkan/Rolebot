@@ -32,10 +32,14 @@ client.on('message', async msg => {
 		var roleName;
 		if (roleName = await db.getRole(code)) {
 		    var userID = msg.author.id;
+		    if (!msg.guild) {
+		    	console.log(`User with ID: ${userID} tried to redeem the ${roleName} role using the code ${code} via DMs.`);
+		    	msg.reply('You may not redeem a role using DMs.');
+		    	return;
+		    }
 		    var member = msg.guild.members.get(userID);
 		    var username = member.user.username;
 		    var discriminator = member.user.discriminator;
-		    console.log(`${username}#${discriminator}`);
 		    var role = msg.guild.roles.find(r => r.name === roleName);
 		    if (typeof roleName === "boolean") {
 		    	msg.reply(`It appears that the code you supplied has already been redeemed.`);
